@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Dev Chat Thursday — Mini Hackathon Directory</title>
+	<meta
+		name="description"
+		content="Participant directory for the Dev Chat Thursday mini hackathon. Browse projects, open participant pages, and follow the live gallery as submissions appear."
+	/>
+	<style>
+		:root {
+			--cardinal: #8c1515;
+			--cardinal-deep: #5f0f0f;
+			--pine: #2f5d50;
+			--ink: #191919;
+			--ink-soft: #424242;
+			--stone: #e8e2d6;
+			--paper: #f8f5ef;
+			--paper-bright: #fffdf9;
+			--line: rgba(25, 25, 25, 0.12);
+			--shadow: 0 16px 40px rgba(57, 39, 22, 0.08);
+			--radius: 20px;
+			--radius-sm: 12px;
+			--max-width: 1180px;
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		html {
+			scroll-behavior: smooth;
+		}
+
+		body {
+			margin: 0;
+			color: var(--ink);
+			font-family: Georgia, "Times New Roman", serif;
+			background:
+				radial-gradient(circle at top left, rgba(140, 21, 21, 0.08), transparent 32%),
+				linear-gradient(180deg, #f5efe5 0%, var(--paper) 30%, #f1ece2 100%);
+			min-height: 100vh;
+		}
+
+		a {
+			color: inherit;
+		}
+
+		a:focus-visible,
+		button:focus-visible {
+			outline: 3px solid #0f6cbd;
+			outline-offset: 3px;
+			border-radius: 6px;
+		}
+
+		.skip-link {
+			position: absolute;
+			left: 1rem;
+			top: -3rem;
+			z-index: 1000;
+			padding: 0.8rem 1rem;
+			color: #fff;
+			background: var(--ink);
+			text-decoration: none;
+			transition: top 0.2s ease;
+		}
+
+		.skip-link:focus {
+			top: 1rem;
+		}
+
+		.page-shell {
+			width: min(calc(100% - 2rem), var(--max-width));
+			margin: 0 auto;
+			padding: 1.25rem 0 3rem;
+		}
+
+		.masthead {
+			display: grid;
+			gap: 1.5rem;
+			margin-bottom: 2rem;
+			padding: 1.5rem;
+			border: 1px solid var(--line);
+			border-radius: var(--radius);
+			background: rgba(255, 253, 249, 0.72);
+			box-shadow: var(--shadow);
+			backdrop-filter: blur(12px);
+		}
+
+		.masthead__top {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			justify-content: space-between;
+			gap: 1rem;
+			border-bottom: 1px solid var(--line);
+			padding-bottom: 1rem;
+		}
+
+		.eyebrow {
+			margin: 0;
+			color: var(--cardinal);
+			font-size: 0.82rem;
+			font-weight: 700;
+			letter-spacing: 0.16em;
+			text-transform: uppercase;
+			font-family: "Helvetica Neue", Arial, sans-serif;
+		}
+
+		.timestamp {
+			margin: 0;
+			color: var(--ink-soft);
+			font-size: 0.95rem;
+			font-family: "Helvetica Neue", Arial, sans-serif;
+		}
+
+		.masthead__body {
+			display: grid;
+			grid-template-columns: minmax(0, 2.2fr) minmax(280px, 1fr);
+			gap: 1.5rem;
+			align-items: start;
+		}
+
+		h1,
+		h2,
+		h3 {
+			margin: 0;
+			line-height: 1.05;
+			font-weight: 600;
+		}
+
+		h1 {
+			font-size: clamp(2.25rem, 6vw, 4.75rem);
+			letter-spacing: -0.04em;
+			max-width: 11ch;
+		}
+
+		.lede {
+			margin: 1rem 0 0;
+			max-width: 60ch;
+			color: var(--ink-soft);
+			font-size: 1.08rem;
+			line-height: 1.7;
+			font-family: "Helvetica Neue", Arial, sans-serif;
+		}
+
+		.masthead__note {
+			padding: 1rem;
+			border-radius: var(--radius-sm);
+			background: linear-gradient(180deg, rgba(140, 21, 21, 0.08), rgba(140, 21, 21, 0.02));
+			border: 1px solid rgba(140, 21, 21, 0.14);
+		}
+
+		.masthead__note h2 {
+			font-size: 1.15rem;
+			margin-bottom: 0.65rem;
+		}
+
+		.countdown-copy {
+			margin-bottom: 0.85rem;
+		}
+
+		.countdown-target {
+			display: inline-flex;
+			align-items: center;
+			padding: 0.32rem 0.7rem;
+			margin-bottom: 1rem;
+			border-radius: 999px;
+			background: rgba(140, 21, 21, 0.1);
+			color: var(--cardinal-deep);
+			font-size: 0.8rem;
+			font-weight: 700;
+			letter-spacing: 0.04em;
+			font-family: "Helvetica Neue", Arial, sans-serif;
+		}
+
+		.countdown-grid {
+			display: grid;
+			grid-template-columns: repeat(4, minmax(0, 1fr));
+			gap: 0.65rem;
+			margin-bottom: 0.9rem;
+		}
+
+		.countdown-unit {
+			padding: 0.8rem 0.65rem;
+			border: 1px solid rgba(140, 21, 21, 0.14);
+			border-radius: 14px;
+			background: rgba(255, 253, 249, 0.7);
+			text-align: center;
+		}
+
+		.countdown-value {
+			display: block;
+			font-size: clamp(1.4rem, 4vw, 2rem);
+			line-height: 1;
+			color: var(--ink);
+			font-variant-numeric: tabular-nums;
+		}
+
+		.countdown-label {
+			display: block;
+			margin-top: 0.35rem;
+			color: var(--ink-soft);
+			font-size: 0.75rem;
+			font-weight: 700;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+			font-family: "Helvetica Neue", Arial, sans-serif;
+		}
+
+		.countdown-status {
+			min-height: 1.35rem;
+			font-size: 0.92rem;
+			font-family: "Helvetica Neue", Arial, sans-serif;
+		}
+
+		.masthead__note p,
+		.masthead__note li {
+			margin: 0;
+			color: var(--ink-soft);
+			line-height: 1.65;
+			font-family: "Helvetica Neue", Arial, sans-serif;
+		}
+
+		.masthead__note ul {
+			margin: 0.75rem 0 0;
+			padding-left: 1.1rem;
+			display: grid;
+			gap: 0.4rem;
+		}
+
+		main {
+			display: grid;
+			gap: 1.5rem;
+		}
+
+		.section-card {
+			padding: 1.5rem;
+			border: 1px solid var(--line);
+			border-radius: var(--radius);
+			background: rgba(255, 253, 249, 0.78);
+			box-shadow: var(--shadow);
+		}
+
+		.section-heading {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: end;
+			justify-content: space-between;
+			gap: 0.8rem;
+			margin-bottom: 1.25rem;
+		}
+
+		.section-heading h2 {
+			font-size: clamp(1.8rem, 4vw, 2.75rem);
+			letter-spacing: -0.03em;
+		}
+
+		.section-heading p {
+			margin: 0;
+			color: var(--ink-soft);
+			max-width: 52ch;
+			line-height: 1.65;
+			font-family: "Helvetica Neue", Arial, sans-serif;
+		}
+
+		.directory-status {
+			margin: 0 0 1rem;
+			min-height: 1.4rem;
+			color: var(--ink-soft);
+			font-size: 0.95rem;
+			font-family: "Helvetica Neue", Arial, sans-serif;
+		}
+
+		.directory-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+			gap: 1rem;
+		}
+
+		.project-card {
+			display: grid;
+			gap: 0.9rem;
+			min-height: 220px;
+			padding: 1.15rem;
+			border: 1px solid var(--line);
+			border-radius: 18px;
+			background:
+				linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(247, 242, 233, 0.92)),
+				linear-gradient(135deg, rgba(140, 21, 21, 0.05), transparent 55%);
+			transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+		}
+
+		.project-card:hover,
+		.project-card:focus-within {
+			transform: translateY(-2px);
+			box-shadow: 0 18px 34px rgba(57, 39, 22, 0.12);
+			border-color: rgba(140, 21, 21, 0.22);
+		}
+
+		.project-card--placeholder {
+			background:
+				linear-gradient(180deg, rgba(245, 238, 226, 0.9), rgba(241, 236, 226, 0.98));
+			border-style: dashed;
+		}
+
+		.project-card__meta {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 0.75rem;
+		}
+
+		.project-index {
+			color: var(--cardinal);
+			font-size: 0.8rem;
+			font-weight: 700;
+			letter-spacing: 0.16em;
+			text-transform: uppercase;
+			font-family: "Helvetica Neue", Arial, sans-serif;
+		}
+
+		.status-pill {
+			display: inline-flex;
+			align-items: center;
+			padding: 0.3rem 0.65rem;
+			border-radius: 999px;
+			background: rgba(47, 93, 80, 0.1);
+			color: var(--pine);
+			font-size: 0.8rem;
+			font-weight: 700;
+			letter-spacing: 0.04em;
+			font-family: "Helvetica Neue", Arial, sans-serif;
+		}
+
+		.project-card h3 {
+			font-size: 1.4rem;
+		}
+
+		.project-card p {
+			margin: 0;
+			color: var(--ink-soft);
+			line-height: 1.65;
+			font-family: "Helvetica Neue", Arial, sans-serif;
+		}
+
+		.project-link {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.4rem;
+			width: fit-content;
+			margin-top: auto;
+			color: var(--cardinal-deep);
+			font-weight: 700;
+			text-decoration-thickness: 1.5px;
+			text-underline-offset: 0.16em;
+			font-family: "Helvetica Neue", Arial, sans-serif;
+		}
+
+		.project-link::after {
+			content: "↗";
+			font-size: 0.9em;
+		}
+
+		.support-grid {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 1rem;
+		}
+
+		.support-panel {
+			padding: 1.25rem;
+			border-radius: 18px;
+			border: 1px solid var(--line);
+			background: rgba(255, 255, 255, 0.58);
+		}
+
+		.support-panel h3 {
+			margin-bottom: 0.7rem;
+			font-size: 1.25rem;
+		}
+
+		.support-panel p,
+		.support-panel li,
+		footer p {
+			margin: 0;
+			color: var(--ink-soft);
+			line-height: 1.7;
+			font-family: "Helvetica Neue", Arial, sans-serif;
+		}
+
+		.support-panel ul {
+			margin: 0;
+			padding-left: 1.1rem;
+			display: grid;
+			gap: 0.45rem;
+		}
+
+		footer {
+			padding: 1rem 0 0;
+		}
+
+		.fine-print {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: space-between;
+			gap: 0.75rem;
+			padding-top: 1rem;
+			border-top: 1px solid var(--line);
+		}
+
+		@media (max-width: 900px) {
+			.masthead__body,
+			.support-grid {
+				grid-template-columns: 1fr;
+			}
+		}
+
+		@media (max-width: 640px) {
+			.page-shell {
+				width: min(calc(100% - 1rem), var(--max-width));
+				padding-top: 0.5rem;
+			}
+
+			.masthead,
+			.section-card {
+				padding: 1.1rem;
+			}
+
+			h1 {
+				max-width: none;
+			}
+
+			.countdown-grid {
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+			}
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			html {
+				scroll-behavior: auto;
+			}
+
+			*,
+			*::before,
+			*::after {
+				animation: none !important;
+				transition: none !important;
+			}
+		}
+	</style>
+</head>
+<body>
+	<a class="skip-link" href="#main-content">Skip to main content</a>
+
+	<div class="page-shell">
+		<header class="masthead">
+			<div class="masthead__top">
+				<p class="eyebrow">Dev Chat Thursday</p>
+				<p class="timestamp">Mini Hackathon Directory · Live on GitHub Pages</p>
+			</div>
+
+			<div class="masthead__body">
+				<div>
+					<h1>Theme: TBD</h1>
+          <p>More details will be revealed soon. Stay tuned!</p>
+				</div>
+
+				<aside class="masthead__note" aria-labelledby="note-heading">
+					<h2 id="note-heading">Countdown</h2>
+					<p class="countdown-copy">The mini hackathon kicks off Thursday morning. Consider this the official ticking clock.</p>
+					<p>&nbsp;</p>
+					<div class="countdown-grid" aria-label="Countdown to hackathon start">
+						<div class="countdown-unit">
+							<span class="countdown-value" id="countdown-days">00</span>
+							<span class="countdown-label">Days</span>
+						</div>
+						<div class="countdown-unit">
+							<span class="countdown-value" id="countdown-hours">00</span>
+							<span class="countdown-label">Hours</span>
+						</div>
+						<div class="countdown-unit">
+							<span class="countdown-value" id="countdown-minutes">00</span>
+							<span class="countdown-label">Minutes</span>
+						</div>
+						<div class="countdown-unit">
+							<span class="countdown-value" id="countdown-seconds">00</span>
+							<span class="countdown-label">Seconds</span>
+						</div>
+					</div>
+					<p id="countdown-status" class="countdown-status" role="status" aria-live="polite">Counting down to Thursday, May 28 at 10:05 AM Pacific.</p>
+				</aside>
+			</div>
+		</header>
+
+		<main id="main-content" tabindex="-1">
+			<section class="section-card" aria-labelledby="directory-heading">
+				<div class="section-heading">
+					<div>
+						<h2 id="directory-heading">Participant directory</h2>
+						<p>Open a participant page, browse the live list, and keep an eye on new additions as the gallery fills in.</p>
+					</div>
+				</div>
+
+				<p id="directory-status" class="directory-status" role="status" aria-live="polite">Loading participant folders…</p>
+				<div id="directory-grid" class="directory-grid" aria-describedby="directory-status"></div>
+			</section>
+
+			<section class="section-card" aria-labelledby="notes-heading">
+				<div class="section-heading">
+					<div>
+						<h2 id="notes-heading">How it works</h2>
+						<p>A little logistics, without stepping on the suspense.</p>
+					</div>
+				</div>
+
+				<div class="support-grid">
+					<article class="support-panel">
+						<h3>Submission structure</h3>
+						<ul>
+							<li>Each participant gets a dedicated folder inside <code>participants/</code>.</li>
+							<li>A browser-ready <code>index.html</code> is enough to publish a project.</li>
+							<li>Additional styles, scripts, and assets can stay inside that same folder.</li>
+						</ul>
+					</article>
+
+					<article class="support-panel">
+						<h3>Build &amp; publishing</h3>
+						<ul>
+							<li>GitHub Actions runs on pushes to <code>main</code> or when triggered manually.</li>
+							<li>The Pages build loops through <code>participants/*</code> and installs/builds any folder that includes a <code>package.json</code>, using npm, yarn, or pnpm based on the lockfile it finds.</li>
+							<li>The published artifact strips out build-only files like <code>node_modules</code> and package manifests before deploying to GitHub Pages.</li>
+						</ul>
+					</article>
+				</div>
+			</section>
+		</main>
+
+		<footer>
+			<div class="fine-print">
+				<p>Repository: <strong>SU-SWS / dev-chat</strong></p>
+				<p>Built as a calm little launchpad with a cardinal accent and no spoilers.</p>
+			</div>
+		</footer>
+	</div>
+
+	<script>
+		const repoOwner = "SU-SWS";
+		const repoName = "dev-chat";
+		const participantsPath = "participants";
+		const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${participantsPath}`;
+		const directoryGrid = document.getElementById("directory-grid");
+		const directoryStatus = document.getElementById("directory-status");
+		const countdownDays = document.getElementById("countdown-days");
+		const countdownHours = document.getElementById("countdown-hours");
+		const countdownMinutes = document.getElementById("countdown-minutes");
+		const countdownSeconds = document.getElementById("countdown-seconds");
+		const countdownStatus = document.getElementById("countdown-status");
+		const countdownTarget = new Date("2026-05-28T10:05:00-07:00");
+
+		const placeholders = [
+			{
+				name: "Your Name Here",
+				description: "A participant folder will appear here once it’s added to the repository.",
+				status: "Coming Soon"
+			},
+			{
+				name: "Future Project",
+				description: "This board updates from the repo, so new entries can join without hand-editing the landing page.",
+				status: "Waiting"
+			},
+			{
+				name: "Mysterious Submission",
+				description: "The directory is live. The topic, however, remains tastefully absent for now.",
+				status: "Under Wraps"
+			}
+		];
+
+		function formatParticipantName(name) {
+			return name
+				.replace(/[-_]+/g, " ")
+				.replace(/\b\w/g, (letter) => letter.toUpperCase());
+		}
+
+		async function createProjectData(folderName) {
+			const href = `./participants/${folderName}/`;
+			const fallbackName = formatParticipantName(folderName);
+			const fallbackDescription = `Participant workspace at participants/${folderName}/. Open the project page to view the live submission.`;
+
+			try {
+				const response = await fetch(`${href}index.html`, {
+					headers: {
+						Accept: "text/html"
+					}
+				});
+
+				if (!response.ok) {
+					throw new Error(`Project page returned ${response.status}`);
+				}
+
+				const html = await response.text();
+				const doc = new DOMParser().parseFromString(html, "text/html");
+				const titleText = doc.querySelector("title")?.textContent?.trim();
+				const headingText = doc.querySelector("h1")?.textContent?.trim();
+				const paragraphText = doc.querySelector("p")?.textContent?.trim();
+
+				return {
+					name: headingText || titleText || fallbackName,
+					description: paragraphText || fallbackDescription,
+					status: "Ready",
+					href
+				};
+			} catch (error) {
+				return {
+					name: fallbackName,
+					description: fallbackDescription,
+					status: "Ready",
+					href
+				};
+			}
+		}
+
+		function createCard({ name, description, status, href, placeholder = false }, index) {
+			const article = document.createElement("article");
+			article.className = `project-card${placeholder ? " project-card--placeholder" : ""}`;
+
+			article.innerHTML = `
+				<div class="project-card__meta">
+					<span class="project-index">Entry ${String(index + 1).padStart(2, "0")}</span>
+					<span class="status-pill">${status}</span>
+				</div>
+				<div>
+					<h3>${name}</h3>
+					<p>${description}</p>
+				</div>
+			`;
+
+			if (href) {
+				const link = document.createElement("a");
+				link.className = "project-link";
+				link.href = href;
+				link.textContent = `Open ${name}`;
+				article.appendChild(link);
+			}
+
+			return article;
+		}
+
+		function renderPlaceholders(message) {
+			directoryGrid.innerHTML = "";
+			placeholders.forEach((item, index) => {
+				directoryGrid.appendChild(createCard({ ...item, placeholder: true }, index));
+			});
+			directoryStatus.textContent = message;
+		}
+
+		function renderProjects(projects, message) {
+			directoryGrid.innerHTML = "";
+			projects.forEach((project, index) => {
+				directoryGrid.appendChild(createCard(project, index));
+			});
+			directoryStatus.textContent = message;
+		}
+
+		function formatCountdownValue(value) {
+			return String(value).padStart(2, "0");
+		}
+
+		function updateCountdown() {
+			const now = new Date();
+			const remaining = countdownTarget.getTime() - now.getTime();
+
+			if (remaining <= 0) {
+				countdownDays.textContent = "00";
+				countdownHours.textContent = "00";
+				countdownMinutes.textContent = "00";
+				countdownSeconds.textContent = "00";
+				countdownStatus.textContent = "The countdown has ended — the hackathon is live.";
+				return true;
+			}
+
+			const totalSeconds = Math.floor(remaining / 1000);
+			const days = Math.floor(totalSeconds / 86400);
+			const hours = Math.floor((totalSeconds % 86400) / 3600);
+			const minutes = Math.floor((totalSeconds % 3600) / 60);
+			const seconds = totalSeconds % 60;
+
+			countdownDays.textContent = formatCountdownValue(days);
+			countdownHours.textContent = formatCountdownValue(hours);
+			countdownMinutes.textContent = formatCountdownValue(minutes);
+			countdownSeconds.textContent = formatCountdownValue(seconds);
+			countdownStatus.textContent = "Counting down to Thursday, May 28 at 10:05 AM Pacific.";
+
+			return false;
+		}
+
+		async function loadParticipants() {
+			try {
+				const response = await fetch(apiUrl, {
+					headers: {
+						Accept: "application/vnd.github+json"
+					}
+				});
+
+				if (!response.ok) {
+					throw new Error(`GitHub API returned ${response.status}`);
+				}
+
+				const entries = await response.json();
+				const participantFolders = entries
+					.filter((entry) => entry.type === "dir")
+					.sort((a, b) => a.name.localeCompare(b.name));
+
+				if (participantFolders.length === 0) {
+					renderPlaceholders("No participant folders are live yet. Add one under participants/ and it will appear here.");
+					return;
+				}
+
+				const projects = await Promise.all(
+					participantFolders.map((folder) => createProjectData(folder.name))
+				);
+
+				renderProjects(
+					projects,
+					`${participantFolders.length} participant ${participantFolders.length === 1 ? "folder" : "folders"} currently listed.`
+				);
+			} catch (error) {
+				renderPlaceholders("Participant folders could not be loaded right now, so the directory is showing placeholders instead.");
+				console.error("Unable to load participant folders:", error);
+			}
+		}
+
+		const countdownFinished = updateCountdown();
+		if (!countdownFinished) {
+			const countdownInterval = window.setInterval(() => {
+				const finished = updateCountdown();
+				if (finished) {
+					window.clearInterval(countdownInterval);
+				}
+			}, 1000);
+		}
+
+		loadParticipants();
+	</script>
+</body>
+</html>

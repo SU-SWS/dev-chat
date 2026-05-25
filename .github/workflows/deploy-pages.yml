@@ -1,0 +1,119 @@
+name: Build and deploy GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install and build participant projects
+        shell: bash
+        run: |
+          shopt -s nullglob
+
+          for dir in participants/*/; do
+            dir="${dir%/}"
+
+            if [[ ! -f "$dir/package.json" ]]; then
+              echo "Skipping $dir (no package.json)"
+              continue
+            fi
+
+            if [[ -f "$dir/pnpm-lock.yaml" ]]; then
+              package_manager="pnpm"
+            elif [[ -f "$dir/yarn.lock" ]]; then
+              package_manager="yarn"
+            else
+              package_manager="npm"
+            fi
+
+            echo "Installing dependencies for $dir with $package_manager"
+            if [[ "$package_manager" == "pnpm" ]]; then
+              pnpm --dir "$dir" ci
+            elif [[ "$package_manager" == "yarn" ]]; then
+              if [[ -f "$dir/.yarnrc.yml" ]]; then
+                yarn --cwd "$dir" install --immutable
+              else
+                yarn --cwd "$dir" install --frozen-lockfile
+              fi
+            elif [[ -f "$dir/package-lock.json" ]]; then
+              npm ci --prefix "$dir"
+            else
+              npm install --prefix "$dir"
+            fi
+
+            if node -e "const pkg=require('./${dir}/package.json'); process.exit(pkg.scripts && pkg.scripts.build ? 0 : 1)"; then
+              echo "Running build for $dir with $package_manager"
+              if [[ "$package_manager" == "pnpm" ]]; then
+                pnpm --dir "$dir" build
+              elif [[ "$package_manager" == "yarn" ]]; then
+                yarn --cwd "$dir" build
+              else
+                npm run build --prefix "$dir"
+              fi
+            else
+              echo "Skipping build for $dir (no build script)"
+            fi
+          done
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Prepare Pages artifact
+        run: |
+          mkdir -p _site
+          rsync -av --delete \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='_site/' \
+            --exclude='README.md' \
+            --exclude='THEME.md' \
+            ./ _site/
+          find _site -type d -name node_modules -prune -exec rm -rf '{}' +
+          find _site -type f \( -name package.json -o -name package-lock.json -o -name yarn.lock -o -name pnpm-lock.yaml \) -delete
+          touch _site/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

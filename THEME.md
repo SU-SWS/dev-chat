@@ -1,0 +1,3 @@
+# To Be Announced...
+
+The theme or topic for this weeks challenge will be announced at the beginning of the day on Thursday. Check the #between-two-ferns channel for updates!
