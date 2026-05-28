@@ -7,11 +7,30 @@ let levels         = [];
 let levelIndex     = 0;
 let score          = 0;
 let correctAnswer  = '';
-let answerPoolSize = 3;   // grows by +2 each time the player wins
+let answerPoolSize = 3;
 let gameActive     = false;
 
+// streak
+let streak         = 0;
+
+// difficulty tiers
+function getTierName(poolSize = answerPoolSize) {
+  if (poolSize <= 3) return 'Rookie';
+  if (poolSize <= 5) return 'Pro';
+  if (poolSize <= 7) return 'Expert';
+  return 'Legend';
+}
+
+// bonus round
+let gamePhase    = 'regular'; // 'regular' | 'bonus'
+let bonusMember  = null;
+let bonusCorrect = false;
+
+// timer
 let timerStart  = null;
 let timerRAF    = null;
+
+// coin flip
 let isFlipping  = false;
 let flipAngle   = 0;
 
@@ -86,17 +105,17 @@ function doFlip() {
     isFlipping = false;
     const resultText = document.getElementById('coin-result-text');
     if (result === 'win') {
-      resultText.textContent  = "🎉 Heads! You're in — study up!";
-      flipBtn.textContent     = "SEE THE FACTS! 📋";
-      flipBtn.className       = 'btn btn-cta';
-      flipBtn.disabled        = false;
-      flipBtn.onclick         = renderIntro;
+      resultText.textContent = "🎉 Heads! You're in — study up!";
+      flipBtn.textContent    = 'SEE THE FACTS! 📋';
+      flipBtn.className      = 'btn btn-cta';
+      flipBtn.disabled       = false;
+      flipBtn.onclick        = renderIntro;
     } else {
-      resultText.textContent  = '😬 Tails! Not today...';
-      flipBtn.textContent     = 'FLIP AGAIN 🔄';
-      flipBtn.className       = 'btn btn-cta';
-      flipBtn.disabled        = false;
-      flipBtn.onclick         = doFlip;
+      resultText.textContent = '😬 Tails! Not today...';
+      flipBtn.textContent    = 'FLIP AGAIN 🔄';
+      flipBtn.className      = 'btn btn-cta';
+      flipBtn.disabled       = false;
+      flipBtn.onclick        = doFlip;
     }
   }, 1900);
 }
@@ -125,22 +144,33 @@ function renderIntro() {
 // ── GAME ────────────────────────────────────────────────────────────────
 
 function startGame() {
-  levelIndex = 0;
-  score      = 0;
-  gameActive = true;
-  levels     = buildLevels(5);
+  levelIndex   = 0;
+  score        = 0;
+  streak       = 0;
+  gamePhase    = 'regular';
+  bonusCorrect = false;
+  gameActive   = true;
 
-  document.getElementById('score-total').textContent = levels.length;
+  levels = buildLevels(5);
+
+  // Pick a bonus member not featured in the 5 regular levels
+  const levelNames      = new Set(levels.map(m => m.name));
+  const bonusCandidates = teamMembers.filter(m => !levelNames.has(m.name));
+  bonusMember = bonusCandidates.length > 0 ? shuffle(bonusCandidates)[0] : null;
+
+  const total = 5 + (bonusMember ? 1 : 0);
+  document.getElementById('score-total').textContent = total;
+  document.getElementById('tier-badge').textContent  = `🎯 ${getTierName()}`;
+  document.querySelector('.dim').style.display       = '';
+  updateStreakBadge();
+
   showScreen('game-screen');
   startTimer();
   renderLevel();
 }
 
 function buildLevels(count) {
-  if (teamMembers.length >= count) {
-    return shuffle(teamMembers).slice(0, count);
-  }
-  // Allow repeats when dataset is smaller than level count
+  if (teamMembers.length >= count) return shuffle(teamMembers).slice(0, count);
   const result = [];
   while (result.length < count) {
     shuffle(teamMembers).forEach(m => { if (result.length < count) result.push(m); });
@@ -149,15 +179,18 @@ function buildLevels(count) {
 }
 
 function renderLevel() {
+  document.getElementById('prompt-card').classList.remove('bonus-card');
+  document.querySelector('.dim').style.display = '';
+
   const member       = levels[levelIndex];
   const nameAsPrompt = Math.random() < 0.5;
   const others       = teamMembers.filter(m => m.name !== member.name);
   const wrongCount   = Math.min(answerPoolSize - 1, others.length);
+  const total        = 5 + (bonusMember ? 1 : 0);
 
   document.getElementById('level-num').textContent = levelIndex + 1;
   document.getElementById('score-num').textContent = score;
-  document.getElementById('progress-fill').style.width =
-    `${(levelIndex / levels.length) * 100}%`;
+  document.getElementById('progress-fill').style.width = `${(levelIndex / total) * 100}%`;
 
   let promptLabel, promptText, answers;
 
@@ -165,27 +198,41 @@ function renderLevel() {
     promptLabel   = 'Which fun fact belongs to...';
     promptText    = member.name;
     correctAnswer = member.funFact;
-    answers = shuffle([
-      correctAnswer,
-      ...shuffle(others).slice(0, wrongCount).map(m => m.funFact)
-    ]);
+    answers = shuffle([correctAnswer, ...shuffle(others).slice(0, wrongCount).map(m => m.funFact)]);
   } else {
     promptLabel   = 'Who does this fun fact belong to?';
     promptText    = '"' + member.funFact + '"';
     correctAnswer = member.name;
-    answers = shuffle([
-      correctAnswer,
-      ...shuffle(others).slice(0, wrongCount).map(m => m.name)
-    ]);
+    answers = shuffle([correctAnswer, ...shuffle(others).slice(0, wrongCount).map(m => m.name)]);
   }
 
   document.getElementById('prompt-label').textContent = promptLabel;
   document.getElementById('prompt-text').textContent  = promptText;
   animateIn(document.getElementById('prompt-card'));
+  renderAnswerButtons(answers);
+}
 
+function renderBonusLevel() {
+  correctAnswer = bonusMember.name;
+  const total   = 6;
+
+  document.getElementById('level-num').textContent          = '🎁';
+  document.querySelector('.dim').style.display              = 'none';
+  document.getElementById('score-num').textContent          = score;
+  document.getElementById('progress-fill').style.width      = `${(5 / total) * 100}%`;
+  document.getElementById('prompt-label').textContent       = 'BONUS ROUND · Who said this?';
+  document.getElementById('prompt-text').textContent        = `"${bonusMember.funFact}"`;
+  document.getElementById('prompt-card').classList.add('bonus-card');
+  animateIn(document.getElementById('prompt-card'));
+
+  const others  = teamMembers.filter(m => m.name !== bonusMember.name);
+  const answers = shuffle([bonusMember.name, ...shuffle(others).slice(0, 2).map(m => m.name)]);
+  renderAnswerButtons(answers);
+}
+
+function renderAnswerButtons(answers) {
   document.getElementById('answers').innerHTML =
     answers.map(a => `<button class="btn btn-answer" style="opacity:0">${a}</button>`).join('');
-
   document.querySelectorAll('.btn-answer').forEach((btn, i) => {
     btn.onclick = () => handleAnswer(btn);
     animateIn(btn, 0.05 + i * 0.07);
@@ -203,21 +250,51 @@ function handleAnswer(clicked) {
   if (isCorrect) {
     clicked.classList.add('correct');
     score++;
+    streak++;
     document.getElementById('score-num').textContent = score;
   } else {
     clicked.classList.add('wrong');
+    streak = 0;
     btns.forEach(b => { if (b.textContent === correctAnswer) b.classList.add('correct'); });
   }
 
+  updateStreakBadge();
+
   setTimeout(() => {
     if (!gameActive) return;
+
+    if (gamePhase === 'bonus') {
+      bonusCorrect = isCorrect;
+      showResult('normal');
+      return;
+    }
+
     levelIndex++;
     if (levelIndex >= levels.length) {
-      showResult('normal');
+      if (score === levels.length && bonusMember) {
+        gamePhase = 'bonus';
+        renderBonusLevel();
+      } else {
+        showResult('normal');
+      }
     } else {
       renderLevel();
     }
   }, 1300);
+}
+
+function updateStreakBadge() {
+  const badge = document.getElementById('streak-badge');
+  const numEl = document.getElementById('streak-num');
+  if (streak >= 2) {
+    numEl.textContent          = streak;
+    badge.classList.remove('hidden');
+    badge.style.animation      = 'none';
+    void badge.offsetWidth;
+    badge.style.animation      = 'pop 0.3s ease';
+  } else {
+    badge.classList.add('hidden');
+  }
 }
 
 // ── RESULT ──────────────────────────────────────────────────────────────
@@ -228,7 +305,7 @@ function showResult(reason) {
   clearConfetti();
   showScreen('result-screen');
 
-  const isWin = reason !== 'timeout' && score === levels.length;
+  const isWin = reason !== 'timeout' && score >= levels.length;
 
   document.getElementById('win-view').classList.toggle('hidden', !isWin);
   document.getElementById('lose-view').classList.toggle('hidden', isWin);
@@ -238,15 +315,17 @@ function showResult(reason) {
 
     const nextPool    = answerPoolSize + 2;
     const canGoHarder = nextPool <= teamMembers.length;
+    const tierName    = getTierName();
 
-    document.getElementById('win-difficulty-msg').textContent =
-      `You aced ${answerPoolSize}-choice difficulty!`;
+    let diffMsg = `You aced ${tierName} difficulty!`;
+    if (bonusMember) diffMsg += bonusCorrect ? ' +1 bonus! 🎁' : ' (missed the bonus 😬)';
+    document.getElementById('win-difficulty-msg').textContent = diffMsg;
 
     const harderBtn  = document.getElementById('harder-btn');
     const masteredEl = document.getElementById('mastered-msg');
 
     if (canGoHarder) {
-      harderBtn.textContent = `🔥 PLAY HARDER (${nextPool} choices)`;
+      harderBtn.textContent = `🔥 PLAY AS ${getTierName(nextPool).toUpperCase()} (${nextPool} choices)`;
       harderBtn.classList.remove('hidden');
       masteredEl.classList.add('hidden');
     } else {
@@ -278,14 +357,13 @@ function stopTimer() {
 }
 
 function tickTimer() {
-  const elapsed  = performance.now() - timerStart;
-  const pct      = Math.max(0, 1 - elapsed / TIMER_DURATION);
-  const secsLeft = Math.ceil(pct * 60);
-
+  const elapsed   = performance.now() - timerStart;
+  const pct       = Math.max(0, 1 - elapsed / TIMER_DURATION);
+  const secsLeft  = Math.ceil(pct * 60);
   const fill      = document.getElementById('timer-fill');
   const timerText = document.getElementById('timer-text');
 
-  fill.style.width  = `${pct * 100}%`;
+  fill.style.width      = `${pct * 100}%`;
   timerText.textContent = `${Math.floor(secsLeft / 60)}:${String(secsLeft % 60).padStart(2, '0')}`;
 
   if (pct > 0.33) {
@@ -310,7 +388,12 @@ function tickTimer() {
 
 function timeUp() {
   document.querySelectorAll('.btn-answer').forEach(b => b.disabled = true);
-  showResult('timeout');
+  // If time runs out during the bonus, they still earned the win
+  if (gamePhase === 'bonus') {
+    showResult('normal');
+  } else {
+    showResult('timeout');
+  }
 }
 
 // ── CONFETTI ─────────────────────────────────────────────────────────────
