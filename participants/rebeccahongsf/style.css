@@ -264,6 +264,40 @@ body {
   font-size: 1rem;
 }
 
+/* ── TIER + STREAK ──────────────────────────────── */
+
+.game-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 1.8rem;
+  margin-bottom: 0.4rem;
+}
+
+.tier-badge {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.streak-badge {
+  background: rgba(255, 231, 129, 0.2);
+  border: 1px solid rgba(255, 231, 129, 0.35);
+  color: var(--yellow);
+  padding: 0.2rem 0.65rem;
+  border-radius: 99px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* ── BONUS CARD ─────────────────────────────────── */
+
+#prompt-card.bonus-card {
+  background: #FFF9E6;
+  border: 2px solid rgba(255, 207, 77, 0.45);
+}
+
 /* ── TIMER ──────────────────────────────────────── */
 
 .timer-row {
