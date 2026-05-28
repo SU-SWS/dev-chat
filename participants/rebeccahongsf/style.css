@@ -458,6 +458,27 @@ body {
   margin-bottom: 0 !important;
 }
 
+/* ── FOOTER ─────────────────────────────────────── */
+
+.site-footer {
+  text-align: center;
+  padding-top: 2rem;
+  width: 100%;
+  max-width: 660px;
+}
+
+.bug-link {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.8rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s;
+}
+
+.bug-link:hover {
+  color: var(--white);
+}
+
 /* ── PRIZE LINK ─────────────────────────────────── */
 
 .prize-link {
