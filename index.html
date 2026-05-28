@@ -145,90 +145,6 @@
 			font-family: "Helvetica Neue", Arial, sans-serif;
 		}
 
-		.masthead__note {
-			padding: 1rem;
-			border-radius: var(--radius-sm);
-			background: linear-gradient(180deg, rgba(140, 21, 21, 0.08), rgba(140, 21, 21, 0.02));
-			border: 1px solid rgba(140, 21, 21, 0.14);
-		}
-
-		.masthead__note h2 {
-			font-size: 1.15rem;
-			margin-bottom: 0.65rem;
-		}
-
-		.countdown-copy {
-			margin-bottom: 0.85rem;
-		}
-
-		.countdown-target {
-			display: inline-flex;
-			align-items: center;
-			padding: 0.32rem 0.7rem;
-			margin-bottom: 1rem;
-			border-radius: 999px;
-			background: rgba(140, 21, 21, 0.1);
-			color: var(--cardinal-deep);
-			font-size: 0.8rem;
-			font-weight: 700;
-			letter-spacing: 0.04em;
-			font-family: "Helvetica Neue", Arial, sans-serif;
-		}
-
-		.countdown-grid {
-			display: grid;
-			grid-template-columns: repeat(4, minmax(0, 1fr));
-			gap: 0.65rem;
-			margin-bottom: 0.9rem;
-		}
-
-		.countdown-unit {
-			padding: 0.8rem 0.65rem;
-			border: 1px solid rgba(140, 21, 21, 0.14);
-			border-radius: 14px;
-			background: rgba(255, 253, 249, 0.7);
-			text-align: center;
-		}
-
-		.countdown-value {
-			display: block;
-			font-size: clamp(1.4rem, 4vw, 2rem);
-			line-height: 1;
-			color: var(--ink);
-			font-variant-numeric: tabular-nums;
-		}
-
-		.countdown-label {
-			display: block;
-			margin-top: 0.35rem;
-			color: var(--ink-soft);
-			font-size: 0.75rem;
-			font-weight: 700;
-			letter-spacing: 0.08em;
-			text-transform: uppercase;
-			font-family: "Helvetica Neue", Arial, sans-serif;
-		}
-
-		.countdown-status {
-			min-height: 1.35rem;
-			font-size: 0.92rem;
-			font-family: "Helvetica Neue", Arial, sans-serif;
-		}
-
-		.masthead__note p,
-		.masthead__note li {
-			margin: 0;
-			color: var(--ink-soft);
-			line-height: 1.65;
-			font-family: "Helvetica Neue", Arial, sans-serif;
-		}
-
-		.masthead__note ul {
-			margin: 0.75rem 0 0;
-			padding-left: 1.1rem;
-			display: grid;
-			gap: 0.4rem;
-		}
 
 		main {
 			display: grid;
@@ -432,9 +348,6 @@
 				max-width: none;
 			}
 
-			.countdown-grid {
-				grid-template-columns: repeat(2, minmax(0, 1fr));
-			}
 		}
 
 		@media (prefers-reduced-motion: reduce) {
@@ -520,12 +433,6 @@
 		const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${participantsPath}`;
 		const directoryGrid = document.getElementById("directory-grid");
 		const directoryStatus = document.getElementById("directory-status");
-		const countdownDays = document.getElementById("countdown-days");
-		const countdownHours = document.getElementById("countdown-hours");
-		const countdownMinutes = document.getElementById("countdown-minutes");
-		const countdownSeconds = document.getElementById("countdown-seconds");
-		const countdownStatus = document.getElementById("countdown-status");
-		const countdownTarget = new Date("2026-05-28T10:05:00-07:00");
 
 		const placeholders = [
 			{
@@ -631,38 +538,6 @@
 			directoryStatus.textContent = message;
 		}
 
-		function formatCountdownValue(value) {
-			return String(value).padStart(2, "0");
-		}
-
-		function updateCountdown() {
-			const now = new Date();
-			const remaining = countdownTarget.getTime() - now.getTime();
-
-			if (remaining <= 0) {
-				countdownDays.textContent = "00";
-				countdownHours.textContent = "00";
-				countdownMinutes.textContent = "00";
-				countdownSeconds.textContent = "00";
-				countdownStatus.textContent = "The countdown has ended — the hackathon is live.";
-				return true;
-			}
-
-			const totalSeconds = Math.floor(remaining / 1000);
-			const days = Math.floor(totalSeconds / 86400);
-			const hours = Math.floor((totalSeconds % 86400) / 3600);
-			const minutes = Math.floor((totalSeconds % 3600) / 60);
-			const seconds = totalSeconds % 60;
-
-			countdownDays.textContent = formatCountdownValue(days);
-			countdownHours.textContent = formatCountdownValue(hours);
-			countdownMinutes.textContent = formatCountdownValue(minutes);
-			countdownSeconds.textContent = formatCountdownValue(seconds);
-			countdownStatus.textContent = "Counting down to Thursday, May 28 at 10:05 AM Pacific.";
-
-			return false;
-		}
-
 		async function loadParticipants() {
 			try {
 				const response = await fetch(apiUrl, {
@@ -697,16 +572,6 @@
 				renderPlaceholders("Participant folders could not be loaded right now, so the directory is showing placeholders instead.");
 				console.error("Unable to load participant folders:", error);
 			}
-		}
-
-		const countdownFinished = updateCountdown();
-		if (!countdownFinished) {
-			const countdownInterval = window.setInterval(() => {
-				const finished = updateCountdown();
-				if (finished) {
-					window.clearInterval(countdownInterval);
-				}
-			}, 1000);
 		}
 
 		loadParticipants();
