@@ -126,7 +126,7 @@ select {
 
 .hero {
   display: grid;
-  gap: 1.5rem;
+  gap: 1.25rem;
   padding: 2rem;
   overflow: hidden;
   position: relative;
@@ -142,68 +142,30 @@ select {
   background: radial-gradient(circle, rgba(140, 21, 21, 0.2), transparent 68%);
 }
 
-.campus-motif {
-  display: flex;
-  gap: 0.75rem;
-  align-items: end;
-  height: 4.8rem;
-  opacity: 0.9;
-}
-
-.redwood {
-  position: relative;
-  width: 1rem;
-  border-radius: 999px 999px 0 0;
-  background: linear-gradient(180deg, rgba(42, 63, 43, 0.95) 0%, rgba(88, 31, 21, 0.95) 100%);
-}
-
-.redwood::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: 100%;
-  transform: translateX(-50%);
-  width: 2.2rem;
-  height: 1.4rem;
-  border-radius: 1.4rem 1.4rem 0.7rem 0.7rem;
-  background: linear-gradient(180deg, rgba(64, 95, 66, 0.96) 0%, rgba(47, 73, 49, 0.94) 100%);
-}
-
-.redwood-tall {
-  height: 3.4rem;
-}
-
-.redwood-mid {
-  height: 2.8rem;
-}
-
-.redwood-short {
-  height: 2.2rem;
-}
-
 .brand-bar {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  align-items: start;
+  align-items: center;
   justify-content: space-between;
-  padding-bottom: 1.25rem;
+  padding-bottom: 0.9rem;
   border-bottom: 1px solid rgba(95, 17, 17, 0.12);
 }
 
 .mock-logo {
   display: flex;
   gap: 1rem;
-  align-items: center;
+  align-items: flex-start;
+  flex: 1 1 28rem;
 }
 
 .mock-logo-block {
   display: grid;
   place-items: center;
-  width: 6.4rem;
-  min-width: 6.4rem;
-  min-height: 5.2rem;
-  padding: 0.8rem;
+  width: 5.3rem;
+  min-width: 5.3rem;
+  min-height: 4.5rem;
+  padding: 0.75rem;
   border-radius: 1.2rem;
   border: 1px solid rgba(255, 255, 255, 0.18);
   background: linear-gradient(180deg, #8c1515 0%, #730f17 100%);
@@ -212,30 +174,9 @@ select {
   text-align: center;
 }
 
-.mock-logo-tree {
-  position: relative;
-  width: 1.15rem;
-  height: 1.7rem;
-  margin-bottom: 0.1rem;
-  border-radius: 999px 999px 0 0;
-  background: linear-gradient(180deg, rgba(61, 102, 62, 0.94) 0%, rgba(98, 42, 22, 0.98) 100%);
-}
-
-.mock-logo-tree::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: 82%;
-  transform: translateX(-50%);
-  width: 2.3rem;
-  height: 1.15rem;
-  border-radius: 1.3rem 1.3rem 0.7rem 0.7rem;
-  background: linear-gradient(180deg, rgba(75, 114, 77, 0.95) 0%, rgba(53, 86, 56, 0.95) 100%);
-}
-
 .mock-logo-mark {
   font-family: "Cormorant Garamond", serif;
-  font-size: 2.05rem;
+  font-size: 2.25rem;
   line-height: 1;
   font-weight: 700;
 }
@@ -256,8 +197,10 @@ select {
 
 .mock-logo-name {
   font-family: "Cormorant Garamond", serif;
-  font-size: 1.45rem;
+  max-width: none;
+  font-size: clamp(2.8rem, 6vw, 4.8rem);
   font-weight: 600;
+  line-height: 0.92;
 }
 
 .mock-logo-note {
@@ -306,15 +249,6 @@ select {
   color: var(--ink);
 }
 
-.hero-kicker {
-  margin: 0 0 0.85rem;
-  color: var(--gold);
-  font-size: 0.92rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
 .eyebrow {
   margin: 0 0 0.5rem;
   font-size: 0.78rem;
@@ -333,7 +267,7 @@ h2 {
 }
 
 h1 {
-  max-width: 10ch;
+  max-width: none;
   font-size: clamp(3rem, 7vw, 5.8rem);
 }
 
@@ -348,8 +282,13 @@ h2 {
   color: var(--muted);
 }
 
+.hero-copy {
+  display: grid;
+  gap: 0.4rem;
+}
+
 .hero-text {
-  max-width: 44rem;
+  max-width: 52rem;
   font-size: 1.08rem;
   line-height: 1.7;
 }
@@ -739,6 +678,19 @@ h2 {
   margin-bottom: 0.25rem;
 }
 
+.site-footer {
+  width: min(100vw - 2rem, 1120px);
+  margin: 0 auto 1.5rem;
+  padding: 0 0.75rem 1rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.site-footer p {
+  margin: 0;
+}
+
 @media (max-width: 860px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
@@ -771,9 +723,5 @@ h2 {
 
   .mock-logo {
     align-items: flex-start;
-  }
-
-  .campus-motif {
-    height: 3.7rem;
   }
 }

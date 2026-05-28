@@ -93,7 +93,11 @@
 - The submit button is now the intentional reveal moment, with result pop animation and scroll-to-result behavior
 - Slider helper text now says `Selected` instead of `Current` to clarify that values are staged inputs
 - Certificate parody disclaimer was moved to the footer/sign-off position
-- Stanford atmosphere now leans further into cardinal red plus a small redwood motif
+- Stanford atmosphere now leans further into cardinal red without the extra redwood motif
+- The top section now uses a single identity header instead of separate logo-plus-hero titles
+- Preset field offices now include 3 California locations plus several global jurisdictions
+- Each preset location now carries a tongue-in-cheek jurisdiction label that shows up in conditions and status copy
+- Result wording now uses deterministic phrase variants tied to weather, location, score, and user inputs so small changes produce meaningfully different findings
 
 ## Sensible build order
 
