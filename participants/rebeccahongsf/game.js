@@ -71,9 +71,12 @@ function doFlip() {
   flipBtn.disabled = true;
   document.getElementById('coin-result-text').innerHTML = '&nbsp;';
 
-  const result   = Math.random() < 0.5 ? 'win' : 'lose';
-  const spins    = 5 + Math.floor(Math.random() * 4);
-  flipAngle      = flipAngle + spins * 360 + (result === 'lose' ? 180 : 0);
+  const result      = Math.random() < 0.5 ? 'win' : 'lose';
+  const spins       = 5 + Math.floor(Math.random() * 4);
+  const targetMod   = result === 'win' ? 0 : 180;
+  const currentMod  = ((flipAngle % 360) + 360) % 360;
+  const adjustment  = (targetMod - currentMod + 360) % 360;
+  flipAngle         = flipAngle + spins * 360 + adjustment;
 
   const coin = document.getElementById('coin');
   coin.style.transition = 'transform 1.8s cubic-bezier(0.33, 1, 0.68, 1)';
