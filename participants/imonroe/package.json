@@ -1,0 +1,19 @@
+{
+  "name": "ian-devchat-hackathon",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LAGUNITA — Real-Time Lake Conditions & Tide Tracker (Dev Chat hackathon, imonroe)",
+  "type": "module",
+  "author": "",
+  "license": "ISC",
+  "scripts": {
+    "build": "npx @tailwindcss/cli -i src/input.css -o style.css --minify",
+    "test": "node --test",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.0",
+    "tailwindcss": "^4.3.0",
+    "prettier": "^3.3.0"
+  }
+}
