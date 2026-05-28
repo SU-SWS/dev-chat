@@ -1,0 +1,13 @@
+{
+	"useTabs": true,
+	"semi": true,
+	"singleQuote": true,
+	"printWidth": 80,
+	"trailingComma": "es5",
+	"overrides": [
+		{
+			"files": ["*.json", "*.css", "*.html"],
+			"options": { "useTabs": false }
+		}
+	]
+}

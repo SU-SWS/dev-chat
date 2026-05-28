@@ -1,16 +1,356 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>imonroe — Dev Chat</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body class="min-h-screen bg-stone-50 text-stone-950 antialiased">
-  <a class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:rounded-md focus:bg-stone-950 focus:px-4 focus:py-2 focus:text-stone-50" href="#main-content">Skip to main content</a>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LAGUNITA — Real-Time Lake Conditions &amp; Tide Tracker</title>
+    <meta
+      name="description"
+      content="An official-looking hydrological observatory for Lake Lagunita, Stanford. Genuinely live creek and precipitation data. Always bone dry."
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="js/main.js"></script>
+  </head>
+  <body class="topo-bg text-stone-900 antialiased">
+    <a
+      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-stone-900 focus:px-4 focus:py-2 focus:text-stone-50"
+      href="#main-content"
+      >Skip to main content</a
+    >
 
-  <main id="main-content" class="mx-auto max-w-5xl px-6 py-16 sm:px-8">
-    <h1>Coming soon.</h1>
-  </main>
-</body>
+    <!-- HISTORIC FILL alarm banner (revealed only during the easter egg) -->
+    <div
+      class="historic-banner items-center justify-center gap-3 bg-cardinal-900 px-4 py-2 text-stone-50"
+      role="alert"
+    >
+      <span class="status-pill status-pill--alarm">Historic Fill</span>
+      <span class="mono" style="color: #f8efe8"
+        >Water detected in basin — event in progress</span
+      >
+    </div>
+
+    <div class="mx-auto max-w-5xl px-5 py-6 sm:px-8 sm:py-10">
+      <!-- ================= Masthead ================= -->
+      <header
+        class="flex flex-col gap-5 border-b border-line pb-6 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div class="flex items-center gap-4">
+          <div
+            id="seal"
+            class="h-20 w-20 shrink-0 cursor-pointer sm:h-24 sm:w-24"
+            title="Lake Lagunita Field Observatory"
+          ></div>
+          <div>
+            <p class="mono-sm">United States · Inland Waters Division</p>
+            <h1
+              class="text-3xl font-bold tracking-wide text-cardinal-900 sm:text-4xl"
+            >
+              LAGUNITA
+            </h1>
+            <p class="text-sm text-stone-700">
+              Real-Time Lake Conditions &amp; Tide Tracker
+            </p>
+            <p class="mono-sm mt-1">Field Observatory · Stanford, California</p>
+          </div>
+        </div>
+
+        <div
+          class="flex flex-col items-start gap-2 sm:items-end"
+          role="group"
+          aria-label="Measurement units"
+        >
+          <span class="mono-sm">Units</span>
+          <div
+            class="inline-flex overflow-hidden rounded-full border border-line"
+          >
+            <button
+              id="unit-imperial"
+              type="button"
+              class="mono px-3 py-1.5"
+              aria-pressed="true"
+            >
+              Imperial
+            </button>
+            <button
+              id="unit-metric"
+              type="button"
+              class="mono border-l border-line px-3 py-1.5"
+              aria-pressed="false"
+            >
+              Metric
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main id="main-content" class="flex flex-col gap-5 py-6">
+        <!-- ================= Hero readout ================= -->
+        <section
+          class="panel flex flex-col gap-5 p-6 sm:flex-row sm:items-end sm:justify-between sm:p-8"
+          aria-labelledby="hero-caption"
+        >
+          <div>
+            <p id="hero-caption" class="mono">Current Depth</p>
+            <p class="mt-2 flex items-baseline gap-2">
+              <span
+                id="hero-depth"
+                class="tabular font-display text-6xl font-bold leading-none text-cardinal-900 sm:text-7xl"
+                >0.00</span
+              >
+              <span
+                id="hero-depth-unit"
+                class="font-display text-2xl text-stone-700"
+                >ft</span
+              >
+            </p>
+            <p class="mt-3 flex flex-wrap items-center gap-3">
+              <span id="hero-trend" class="mono tabular">▼ 0.00 ft (24h)</span>
+              <span id="hero-status" class="status-pill status-pill--dry"
+                >Bone Dry</span
+              >
+            </p>
+            <p id="last-updated" class="mono-sm mt-3" aria-live="polite">
+              Awaiting live reading…
+            </p>
+          </div>
+          <div class="shrink-0">
+            <p class="mono-sm mb-1">24-hour micro-trend</p>
+            <div id="hero-spark" aria-hidden="false"></div>
+          </div>
+        </section>
+
+        <!-- ================= 30-day trend chart ================= -->
+        <section class="panel p-5 sm:p-6" aria-labelledby="chart-caption">
+          <div class="mb-3 flex items-baseline justify-between">
+            <h2 id="chart-caption" class="mono">Water Level · Last 30 Days</h2>
+            <span class="mono-sm">feet</span>
+          </div>
+          <div id="chart"></div>
+        </section>
+
+        <!-- ================= Module grid: gauge / utilization / creek ===== -->
+        <div class="grid gap-5 md:grid-cols-3">
+          <!-- Seepage gauge -->
+          <section class="panel p-5" aria-labelledby="seepage-caption">
+            <h2 id="seepage-caption" class="mono">Seepage Rate</h2>
+            <div id="gauge" class="mt-2"></div>
+            <p class="mt-1 text-center">
+              <span
+                id="seepage-value"
+                class="tabular font-display text-3xl font-bold text-cardinal-900"
+                >−500</span
+              >
+              <span id="seepage-unit" class="text-sm text-stone-700"
+                >gal/min</span
+              >
+            </p>
+            <p class="mono-sm mt-2 text-center">
+              Permeable lakebed · continuous loss
+            </p>
+          </section>
+
+          <!-- Utilization -->
+          <section
+            class="panel flex flex-col justify-center gap-4 p-5"
+            aria-labelledby="util-caption"
+          >
+            <h2 id="util-caption" class="mono">Reservoir Utilization</h2>
+            <dl class="flex flex-col gap-3">
+              <div
+                class="flex items-baseline justify-between border-b border-line pb-2"
+              >
+                <dt class="mono-sm">Designed capacity</dt>
+                <dd class="tabular font-display text-lg">
+                  115,000,000 <span class="text-xs text-stone-700">gal</span>
+                </dd>
+              </div>
+              <div
+                class="flex items-baseline justify-between border-b border-line pb-2"
+              >
+                <dt class="mono-sm">Current contents</dt>
+                <dd class="tabular font-display text-lg">
+                  <span id="contents">~0</span>
+                  <span class="text-xs text-stone-700" id="contents-unit"
+                    >gal</span
+                  >
+                </dd>
+              </div>
+              <div class="flex items-baseline justify-between">
+                <dt class="mono-sm">Utilization</dt>
+                <dd
+                  id="utilization"
+                  class="tabular font-display text-2xl font-bold text-cardinal-900"
+                >
+                  0.0000%
+                </dd>
+              </div>
+            </dl>
+          </section>
+
+          <!-- Live creek module -->
+          <section class="panel p-5" aria-labelledby="creek-caption">
+            <h2 id="creek-caption" class="mono">
+              San Francisquito Creek · USGS 11164500
+            </h2>
+            <dl class="mt-2 flex flex-col gap-3">
+              <div class="flex items-baseline justify-between">
+                <dt class="mono-sm">Discharge</dt>
+                <dd>
+                  <span
+                    id="creek-discharge"
+                    class="tabular font-display text-xl skeleton"
+                    >0.0</span
+                  >
+                  <span class="text-xs text-stone-700" id="creek-discharge-unit"
+                    >cfs</span
+                  >
+                </dd>
+              </div>
+              <div
+                class="flex items-baseline justify-between border-b border-line pb-3"
+              >
+                <dt class="mono-sm">Gauge height</dt>
+                <dd>
+                  <span
+                    id="creek-gauge"
+                    class="tabular font-display text-xl skeleton"
+                    >0.00</span
+                  >
+                  <span class="text-xs text-stone-700" id="creek-gauge-unit"
+                    >ft</span
+                  >
+                </dd>
+              </div>
+              <div class="flex items-center gap-2 pt-1">
+                <span class="text-cardinal-700" aria-hidden="true">→</span>
+                <dt class="mono-sm">Projected Lagunita inflow</dt>
+              </div>
+              <dd
+                class="tabular font-display text-2xl font-bold text-cardinal-900"
+              >
+                <span id="inflow">0</span>
+                <span class="text-xs text-stone-700" id="inflow-unit">gal</span>
+              </dd>
+            </dl>
+            <p id="creek-note" class="mono-sm mt-2">
+              Diversion inactive since 2001 · input observed, output honest
+            </p>
+          </section>
+        </div>
+
+        <!-- ================= Tide table + forecast ================= -->
+        <div class="grid gap-5 md:grid-cols-2">
+          <section class="panel p-5" aria-labelledby="tide-caption">
+            <h2 id="tide-caption" class="mono">Tide Table · Today</h2>
+            <table class="mt-3 w-full text-left">
+              <caption class="sr-only">
+                Predicted high and low tides for Lake Lagunita today
+              </caption>
+              <thead>
+                <tr class="mono-sm">
+                  <th scope="col" class="pb-2 font-normal">Event</th>
+                  <th scope="col" class="pb-2 font-normal">Time</th>
+                  <th scope="col" class="pb-2 text-right font-normal">
+                    Height
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="tide-table" class="tabular">
+                <tr class="border-t border-line">
+                  <td class="py-2">Morning High</td>
+                  <td class="py-2">04:13</td>
+                  <td class="py-2 text-right">0.00 ft</td>
+                </tr>
+                <tr class="border-t border-line">
+                  <td class="py-2">Midday Low</td>
+                  <td class="py-2">10:42</td>
+                  <td class="py-2 text-right">0.00 ft</td>
+                </tr>
+                <tr class="border-t border-line">
+                  <td class="py-2">Evening High</td>
+                  <td class="py-2">16:08</td>
+                  <td class="py-2 text-right">0.00 ft</td>
+                </tr>
+                <tr class="border-t border-line">
+                  <td class="py-2">Overnight Low</td>
+                  <td class="py-2">22:51</td>
+                  <td class="py-2 text-right">0.00 ft</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section class="panel p-5" aria-labelledby="forecast-caption">
+            <h2 id="forecast-caption" class="mono">7-Day Outlook</h2>
+            <ul
+              id="forecast"
+              class="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-7"
+            >
+              <li class="rounded border border-line p-2 text-center">
+                <span class="mono-sm block">—</span>
+                <span class="block text-lg" aria-hidden="true">☀</span>
+                <span class="tabular block text-sm">0.00 ft</span>
+              </li>
+            </ul>
+            <p class="mono-sm mt-3">
+              Outlook: dry. A trace (0.01 ft) is permitted on genuinely rainy
+              days.
+            </p>
+          </section>
+        </div>
+
+        <!-- ================= Salamander advisory ================= -->
+        <section
+          class="panel flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between"
+          aria-labelledby="salamander-caption"
+        >
+          <div>
+            <h2 id="salamander-caption" class="mono">
+              Salamander Breeding Advisory
+            </h2>
+            <p class="mt-1 text-sm text-stone-700">
+              California tiger salamander (<em>Ambystoma californiense</em>)
+            </p>
+            <p id="salamander-note" class="mt-2 max-w-xl text-sm">
+              No standing water. Breeding conditions not met. Population
+              estivating in upland burrows. Advisory level nominal.
+            </p>
+          </div>
+          <span id="salamander-status" class="status-pill status-pill--ok"
+            >Dormant</span
+          >
+        </section>
+      </main>
+    </div>
+
+    <!-- ================= Conditions ticker ================= -->
+    <div id="ticker"></div>
+
+    <!-- ================= Footer ================= -->
+    <footer class="border-t border-line">
+      <div class="mx-auto max-w-5xl px-5 py-8 sm:px-8">
+        <p class="font-display text-xl italic text-cardinal-900">
+          El lago que casi no existe.
+        </p>
+        <p class="mono-sm mt-1">Monitoring the absence of water since 2001.</p>
+        <ul class="mono-sm mt-4 flex flex-col gap-1 sm:flex-row sm:gap-6">
+          <li>Source · USGS NWIS Gauge 11164500</li>
+          <li>Source · Open-Meteo daily precipitation</li>
+          <li>
+            <a
+              href="https://water.noaa.gov/gauges/SFCC1"
+              class="underline"
+              rel="noopener"
+              target="_blank"
+              >NOAA AHPS · Station SFCC1 ↗</a
+            >
+          </li>
+        </ul>
+        <p class="mono-sm mt-4 text-stone-700">
+          Designed capacity from the 1870s Stock Farm reservoir. Lakebed loses
+          an estimated 500 gallons per minute. Not affiliated with the USGS.
+        </p>
+      </div>
+    </footer>
+  </body>
 </html>
