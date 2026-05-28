@@ -461,10 +461,11 @@ body {
 /* ── FOOTER ─────────────────────────────────────── */
 
 .site-footer {
-  text-align: center;
-  padding-top: 2rem;
+  position: fixed;
+  bottom: 1rem;
+  left: 0;
   width: 100%;
-  max-width: 660px;
+  text-align: center;
 }
 
 .bug-link {
