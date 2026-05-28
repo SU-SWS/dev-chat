@@ -1,0 +1,49 @@
+@import "tailwindcss" source(none);
+
+@source "../index.html";
+
+@theme {
+	--font-display: "Georgia", "Times New Roman", serif;
+	--font-body: "Helvetica Neue", Arial, sans-serif;
+	--color-cardinal-700: #8c1515;
+	--color-cardinal-900: #5f0f0f;
+	--color-stone-50: #f8f5ef;
+	--color-stone-100: #efe7d8;
+	--color-stone-200: #ddd0c0;
+	--color-stone-700: #5d5347;
+	--color-stone-950: #1c1612;
+}
+
+@layer base {
+	body {
+		font-family: var(--font-body);
+	}
+
+	h1,
+	h2,
+	h3 {
+		font-family: var(--font-display);
+	}
+
+	a {
+		text-underline-offset: 0.18em;
+	}
+
+	a:focus-visible,
+	button:focus-visible,
+	input:focus-visible {
+		outline: 3px solid #0f6cbd;
+		outline-offset: 3px;
+		border-radius: 0.375rem;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		*,
+		*::before,
+		*::after {
+			animation: none !important;
+			transition: none !important;
+			scroll-behavior: auto !important;
+		}
+	}
+}

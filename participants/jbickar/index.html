@@ -1,5 +1,217 @@
-<html>
-<body>
-<h1>Hello, World.</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HTTP Status Codes — jbickar</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="min-h-screen bg-stone-50 text-stone-950 antialiased">
+  <a class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:rounded-md focus:bg-stone-950 focus:px-4 focus:py-2 focus:text-stone-50" href="#main-content">Skip to main content</a>
+
+  <main id="main-content" class="mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center px-6 py-16 sm:px-8">
+    <div class="w-full space-y-8 rounded-4xl border border-stone-200 bg-white/90 p-8 shadow-[0_20px_60px_rgba(57,39,22,0.10)] backdrop-blur sm:p-12">
+
+      <div class="space-y-2">
+        <p class="font-sans text-sm font-semibold uppercase tracking-[0.28em] text-cardinal-700">Dev Chat · jbickar</p>
+        <h1 class="text-4xl font-semibold tracking-tight text-cardinal-900 sm:text-5xl">HTTP Status Codes</h1>
+        <p class="text-base leading-7 text-stone-700">Enter a status code to see its official meaning and a very good dog.</p>
+      </div>
+
+      <form id="lookup-form" class="flex gap-3" novalidate>
+        <label for="code-input" class="sr-only">HTTP status code</label>
+        <input
+          id="code-input"
+          type="text"
+          inputmode="numeric"
+          pattern="[0-9]{3}"
+          maxlength="3"
+          placeholder="e.g. 404"
+          autocomplete="off"
+          class="w-32 rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-center text-2xl font-semibold tracking-widest text-stone-950 transition placeholder:text-stone-300 focus:border-cardinal-700 focus:bg-white focus:outline-none"
+        />
+        <button
+          type="submit"
+          class="flex-1 rounded-xl bg-cardinal-700 px-6 py-3 font-semibold text-white transition hover:bg-cardinal-900 active:scale-95"
+        >
+          Look up
+        </button>
+      </form>
+
+      <div id="error-msg" class="hidden rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700" role="alert" aria-live="polite"></div>
+
+      <section id="result" class="hidden space-y-6" aria-live="polite" aria-atomic="true">
+        <div class="space-y-1">
+          <div class="flex items-baseline gap-3">
+            <span id="result-code" class="text-5xl font-semibold text-cardinal-700"></span>
+            <span id="result-name" class="text-2xl font-semibold text-cardinal-900"></span>
+          </div>
+          <p id="result-category" class="text-xs font-semibold uppercase tracking-widest text-stone-700"></p>
+        </div>
+        <p id="result-description" class="text-base leading-7 text-stone-700"></p>
+        <div class="overflow-hidden rounded-2xl border border-stone-200 bg-stone-100">
+          <img
+            id="result-image"
+            alt=""
+            class="mx-auto block max-h-80 w-full object-contain"
+          />
+          <p id="image-error" class="hidden p-6 text-center text-sm text-stone-700">No dog image available for this code.</p>
+        </div>
+      </section>
+
+      <a class="inline-flex items-center text-sm font-medium text-stone-700 underline decoration-stone-300 transition hover:text-cardinal-700" href="../">← Back to directory</a>
+    </div>
+  </main>
+
+  <script>
+    const HTTP_CODES = {
+      // 1xx Informational
+      100: { name: "Continue", description: "The server has received the request headers and the client should proceed to send the request body. This interim response indicates everything so far is OK and that the client should continue with the request, or ignore the response if the request is already finished." },
+      101: { name: "Switching Protocols", description: "The server is switching to the protocol specified in the Upgrade header field of the request. The server sends an Upgrade header to indicate which protocol it is switching to." },
+      102: { name: "Processing", description: "The server has received and is processing the request, but no response is available yet. This prevents the client from timing out and assuming the request was lost." },
+      103: { name: "Early Hints", description: "The server is likely to send a final response with the headers included in the informational response, allowing the client to preload resources or preconnect to an origin while the server prepares a response." },
+
+      // 2xx Success
+      200: { name: "OK", description: "The request has succeeded. The meaning of a success varies depending on the HTTP method: GET — the resource has been fetched and is transmitted in the message body; HEAD — the entity headers are included in the response; POST or PUT — the resource describing the result of the action is transmitted in the message body." },
+      201: { name: "Created", description: "The request has succeeded and a new resource has been created as a result. This is typically the response sent after POST requests, or some PUT requests." },
+      202: { name: "Accepted", description: "The request has been received but not yet acted upon. It is noncommittal, since there is no way in HTTP to later send an asynchronous response indicating the outcome of the request." },
+      203: { name: "Non-Authoritative Information", description: "The returned metadata is not exactly the same as is available from the origin server, but is collected from a local or a third-party copy. This is mostly used for mirrors or backups of another resource." },
+      204: { name: "No Content", description: "There is no content to send for this request, but the headers may be useful. The user agent may update its cached headers for this resource with the new ones." },
+      205: { name: "Reset Content", description: "The server has fulfilled the request and desires that the user agent reset the document view which caused the request to be sent to its original state as received from the origin server." },
+      206: { name: "Partial Content", description: "This response code is used when the Range header is sent from the client to request only part of a resource. The server is delivering only part of the resource due to a range header sent by the client." },
+      207: { name: "Multi-Status", description: "Conveys information about multiple resources, for situations where multiple status codes might be appropriate. The response body is a text/xml or application/xml HTTP entity with a multistatus root element." },
+      208: { name: "Already Reported", description: "Used inside a <dav:propstat> response element to avoid repeatedly enumerating the internal members of multiple bindings to the same collection." },
+      226: { name: "IM Used", description: "The server has fulfilled a GET request for the resource, and the response is a representation of the result of one or more instance-manipulations applied to the current instance." },
+
+      // 3xx Redirection
+      300: { name: "Multiple Choices", description: "The request has more than one possible response. The user agent or user should choose one of them. There is no standardized way of choosing one of the responses, but HTML links to the possibilities are recommended." },
+      301: { name: "Moved Permanently", description: "The URL of the requested resource has been changed permanently. The new URL is given by the Location header field in the response. This response is cacheable unless indicated otherwise." },
+      302: { name: "Found", description: "The URI of requested resource has been changed temporarily. Further changes in the URI might be made in the future. Therefore, this same URI should be used by the client in future requests." },
+      303: { name: "See Other", description: "The server sent this response to direct the client to get the requested resource at another URI with a GET request." },
+      304: { name: "Not Modified", description: "This is used for caching purposes. It tells the client that the response has not been modified, so the client can continue to use the same cached version of the response." },
+      305: { name: "Use Proxy", description: "Defined in a previous version of the HTTP specification to indicate that a requested response must be accessed by a proxy. It has been deprecated due to security concerns regarding in-band configuration of a proxy." },
+      307: { name: "Temporary Redirect", description: "The server sends this response to direct the client to get the requested resource at another URI with the same method that was used in the prior request. Unlike 302, the request method is not allowed to be changed to GET." },
+      308: { name: "Permanent Redirect", description: "This means that the resource is now permanently located at another URI, specified by the Location: HTTP Response header. This has the same semantics as 301 Moved Permanently, but the user agent must not change the HTTP method used." },
+
+      // 4xx Client Errors
+      400: { name: "Bad Request", description: "The server could not understand the request due to invalid syntax. The client should not repeat this request without modification." },
+      401: { name: "Unauthorized", description: "Although the HTTP standard specifies 'unauthorized', semantically this response means 'unauthenticated'. That is, the client must authenticate itself to get the requested response." },
+      402: { name: "Payment Required", description: "This response code is reserved for future use. The initial aim for creating this code was using it for digital payment systems, however this status code is used very rarely and no standard convention exists." },
+      403: { name: "Forbidden", description: "The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource. Unlike 401, the client's identity is known to the server." },
+      404: { name: "Not Found", description: "The server can not find the requested resource. In the browser, this means the URL is not recognized. In an API, this can also mean that the endpoint is valid but the resource itself does not exist." },
+      405: { name: "Method Not Allowed", description: "The request method is known by the server but is not supported by the target resource. For example, an API may forbid DELETE-ing a resource." },
+      406: { name: "Not Acceptable", description: "This response is sent when the web server, after performing server-driven content negotiation, doesn't find any content that conforms to the criteria given by the user agent." },
+      407: { name: "Proxy Authentication Required", description: "This is similar to 401 but authentication is needed to be done by a proxy." },
+      408: { name: "Request Timeout", description: "This response is sent on an idle connection by some servers, even without any previous request by the client. It means that the server would like to shut down this unused connection." },
+      409: { name: "Conflict", description: "This response is sent when a request conflicts with the current state of the server." },
+      410: { name: "Gone", description: "This response is sent when the requested content has been permanently deleted from the server, with no forwarding address. Clients are expected to remove their caches and links to the resource." },
+      411: { name: "Length Required", description: "Server rejected the request because the Content-Length header field is not defined and the server requires it." },
+      412: { name: "Precondition Failed", description: "The client has indicated preconditions in its headers which the server does not meet." },
+      413: { name: "Content Too Large", description: "Request entity is larger than limits defined by server. The server might close the connection or return a Retry-After header field." },
+      414: { name: "URI Too Long", description: "The URI requested by the client is longer than the server is willing to interpret." },
+      415: { name: "Unsupported Media Type", description: "The media format of the requested data is not supported by the server, so the server is rejecting the request." },
+      416: { name: "Range Not Satisfiable", description: "The range specified by the Range header field in the request can't be fulfilled; it's possible that the range is outside the size of the target URI's data." },
+      417: { name: "Expectation Failed", description: "This response code means the expectation indicated by the Expect request header field can't be met by the server." },
+      418: { name: "I'm a Teapot", description: "The server refuses the attempt to brew coffee with a teapot. This error is a reference to the Hyper Text Coffee Pot Control Protocol defined in April Fools' jokes in 1998 and 2014. Some websites use this response for requests they do not wish to handle." },
+      421: { name: "Misdirected Request", description: "The request was directed at a server that is not able to produce a response. This can be sent by a server that is not configured to produce responses for the combination of scheme and authority that are included in the request URI." },
+      422: { name: "Unprocessable Content", description: "The request was well-formed but was unable to be followed due to semantic errors." },
+      423: { name: "Locked", description: "The resource that is being accessed is locked." },
+      424: { name: "Failed Dependency", description: "The request failed due to failure of a previous request." },
+      425: { name: "Too Early", description: "Indicates that the server is unwilling to risk processing a request that might be replayed." },
+      426: { name: "Upgrade Required", description: "The server refuses to perform the request using the current protocol but might be willing to do so after the client upgrades to a different protocol." },
+      428: { name: "Precondition Required", description: "The origin server requires the request to be conditional. This response is intended to prevent the 'lost update' problem, where a client GETs a resource's state, modifies it, and PUTs it back to the server." },
+      429: { name: "Too Many Requests", description: "The user has sent too many requests in a given amount of time ('rate limiting')." },
+      431: { name: "Request Header Fields Too Large", description: "The server is unwilling to process the request because its header fields are too large. The request may be resubmitted after reducing the size of the request header fields." },
+      451: { name: "Unavailable For Legal Reasons", description: "The user agent requested a resource that cannot legally be provided, such as a web page censored by a government." },
+
+      // 5xx Server Errors
+      500: { name: "Internal Server Error", description: "The server has encountered a situation it doesn't know how to handle." },
+      501: { name: "Not Implemented", description: "The request method is not supported by the server and cannot be handled. The only methods that servers are required to support (and therefore that must not return this code) are GET and HEAD." },
+      502: { name: "Bad Gateway", description: "This error response means that the server, while working as a gateway to get a response needed to handle the request, got an invalid response." },
+      503: { name: "Service Unavailable", description: "The server is not ready to handle the request. Common causes are a server that is down for maintenance or that is overloaded. Note that together with this response, a user-friendly page explaining the problem should be sent." },
+      504: { name: "Gateway Timeout", description: "This error response is given when the server is acting as a gateway and cannot get a response in time." },
+      505: { name: "HTTP Version Not Supported", description: "The HTTP version used in the request is not supported by the server." },
+      506: { name: "Variant Also Negotiates", description: "The server has an internal configuration error: the chosen variant resource is configured to engage in transparent content negotiation itself, and is therefore not a proper end point in the negotiation process." },
+      507: { name: "Insufficient Storage", description: "The method could not be performed on the resource because the server is unable to store the representation needed to successfully complete the request." },
+      508: { name: "Loop Detected", description: "The server detected an infinite loop while processing the request." },
+      510: { name: "Not Extended", description: "Further extensions to the request are required for the server to fulfill it." },
+      511: { name: "Network Authentication Required", description: "The 511 status code indicates that the client needs to authenticate to gain network access." },
+    };
+
+    const CATEGORIES = {
+      1: "1xx Informational — Request received, continuing process",
+      2: "2xx Success — The action was successfully received, understood, and accepted",
+      3: "3xx Redirection — Further action must be taken to complete the request",
+      4: "4xx Client Error — The request contains bad syntax or cannot be fulfilled",
+      5: "5xx Server Error — The server failed to fulfill an apparently valid request",
+    };
+
+    const form = document.getElementById("lookup-form");
+    const input = document.getElementById("code-input");
+    const errorMsg = document.getElementById("error-msg");
+    const result = document.getElementById("result");
+    const resultCode = document.getElementById("result-code");
+    const resultName = document.getElementById("result-name");
+    const resultCategory = document.getElementById("result-category");
+    const resultDescription = document.getElementById("result-description");
+    const resultImage = document.getElementById("result-image");
+    const imageError = document.getElementById("image-error");
+
+    function showError(msg) {
+      errorMsg.textContent = msg;
+      errorMsg.classList.remove("hidden");
+      result.classList.add("hidden");
+    }
+
+    function showResult(code) {
+      const info = HTTP_CODES[code];
+      const category = CATEGORIES[Math.floor(code / 100)];
+
+      errorMsg.classList.add("hidden");
+
+      resultCode.textContent = code;
+      resultName.textContent = info ? info.name : "Unknown";
+      resultCategory.textContent = category || `${Math.floor(code / 100)}xx`;
+      resultDescription.textContent = info
+        ? info.description
+        : "This is not a registered HTTP status code in the IANA registry.";
+
+      resultImage.classList.remove("hidden");
+      imageError.classList.add("hidden");
+      resultImage.onerror = () => {
+        resultImage.classList.add("hidden");
+        imageError.classList.remove("hidden");
+      };
+      resultImage.src = `https://http.dog/${code}.jpg`;
+      resultImage.alt = `A dog representing HTTP ${code}${info ? " " + info.name : ""}`;
+
+      result.classList.remove("hidden");
+      result.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const raw = input.value.trim();
+
+      if (!/^\d{3}$/.test(raw)) {
+        showError("Please enter a valid 3-digit HTTP status code.");
+        input.focus();
+        return;
+      }
+
+      const code = parseInt(raw, 10);
+      if (code < 100 || code > 599) {
+        showError("HTTP status codes range from 100 to 599.");
+        input.focus();
+        return;
+      }
+
+      showResult(code);
+    });
+
+    input.addEventListener("input", () => {
+      input.value = input.value.replace(/\D/g, "").slice(0, 3);
+    });
+  </script>
 </body>
 </html>
