@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Team Fun Facts Game</title>
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="confetti-container"></div>
+
+    <div class="container">
+      <!-- Intro Screen -->
+      <div id="intro-screen" class="screen">
+        <h1 class="page-title">Team Fun Facts!</h1>
+        <p class="subtitle">Study up — a quiz is coming...</p>
+        <div id="fact-list"></div>
+        <div class="center-btn">
+          <button id="ready-btn" class="btn btn-cta">I'M READY!</button>
+        </div>
+      </div>
+
+      <!-- Coin Flip Screen -->
+      <div id="coin-screen" class="screen hidden">
+        <h2 class="coin-title">Can you enter the game?</h2>
+        <p class="coin-subtitle">Only the coin decides...</p>
+        <div class="coin-stage">
+          <div id="coin">
+            <div class="coin-face coin-front">
+              <span class="coin-icon">🏆</span>
+              <span class="coin-label">YOU'RE IN</span>
+            </div>
+            <div class="coin-face coin-back">
+              <span class="coin-icon">😬</span>
+              <span class="coin-label">TRY AGAIN</span>
+            </div>
+          </div>
+        </div>
+        <p id="coin-result-text" class="coin-result-text">&nbsp;</p>
+        <div class="center-btn">
+          <button id="flip-btn" class="btn btn-cta">FLIP THE COIN!</button>
+        </div>
+      </div>
+
+      <!-- Game Screen -->
+      <div id="game-screen" class="screen hidden">
+        <div class="game-header">
+          <span class="level-tag"
+            >Level <span id="level-num">1</span
+            ><span class="dim"> / 5</span></span
+          >
+          <span class="score-tag"
+            >⭐ <span id="score-num">0</span> /
+            <span id="score-total">5</span></span
+          >
+        </div>
+        <div class="timer-row">
+          <div class="timer-track">
+            <div id="timer-fill"></div>
+          </div>
+          <span id="timer-text" class="timer-text">1:00</span>
+        </div>
+        <div class="progress-track">
+          <div id="progress-fill"></div>
+        </div>
+        <div id="prompt-card">
+          <p id="prompt-label"></p>
+          <p id="prompt-text"></p>
+        </div>
+        <div id="answers"></div>
+      </div>
+
+      <!-- Result Screen -->
+      <div id="result-screen" class="screen hidden">
+        <div id="win-view" class="result-content hidden">
+          <span class="result-emoji">🏆</span>
+          <h2>PERFECT SCORE!</h2>
+          <p>5 out of 5 — you really know your teammates!</p>
+          <p id="win-difficulty-msg" class="difficulty-msg"></p>
+          <div class="result-buttons">
+            <button id="play-again-btn" class="btn btn-cta">PLAY AGAIN</button>
+            <button id="harder-btn" class="btn btn-harder hidden">
+              🔥 PLAY HARDER
+            </button>
+          </div>
+          <p id="mastered-msg" class="mastered-msg hidden"></p>
+        </div>
+        <div id="lose-view" class="result-content hidden">
+          <span class="result-emoji">😅</span>
+          <h2>NICE TRY!</h2>
+          <p id="final-score-text"></p>
+          <button id="try-again-btn" class="btn btn-cta">TRY AGAIN</button>
+        </div>
+      </div>
+    </div>
+    <script src="game.js"></script>
+  </body>
+</html>
