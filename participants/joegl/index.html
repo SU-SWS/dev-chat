@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stanford Bureau of Useful Metrics</title>
+  <meta
+    name="description"
+    content="A dead-serious Stanford-style collection of live data-powered tools for evaluating completely unnecessary things."
+  />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <main id="main-content" class="page-shell">
+    <section class="hero card">
+      <div class="brand-bar" aria-label="Site identity">
+        <div class="mock-logo" aria-hidden="true">
+          <div class="mock-logo-block">
+            <span class="mock-logo-tree"></span>
+            <span class="mock-logo-mark">SUM</span>
+            <span class="mock-logo-submark">Useful Metrics</span>
+          </div>
+          <div class="mock-logo-copy">
+            <p class="mock-logo-name">Stanford Bureau of Useful Metrics</p>
+            <p class="mock-logo-note">Parody administrative unit. Definitely not an official university office.</p>
+          </div>
+        </div>
+
+        <div class="brand-ribbon">
+          <span class="brand-ribbon-chip">Cardinal Adjacent</span>
+          <span class="brand-ribbon-chip">Procedurally Earnest</span>
+          <span class="brand-ribbon-chip">Publicly Unnecessary</span>
+        </div>
+      </div>
+
+      <div class="campus-motif" aria-hidden="true">
+        <div class="redwood redwood-tall"></div>
+        <div class="redwood redwood-mid"></div>
+        <div class="redwood redwood-short"></div>
+        <div class="redwood redwood-mid"></div>
+        <div class="redwood redwood-tall"></div>
+      </div>
+
+      <div class="hero-copy">
+        <p class="eyebrow">Stanford-Adjacent Administrative Excellence</p>
+        <p class="hero-kicker">Established for the public good and almost certainly not satire.</p>
+        <h1>Stanford Bureau of Useful Metrics</h1>
+        <p class="hero-text">
+          A solemn institutional effort to transform current weather and clock time into
+          metrics of obvious public value, such as loitering legitimacy, queue suffering,
+          and errand sympathy.
+        </p>
+      </div>
+
+      <div class="hero-actions">
+        <label class="location-select-wrap">
+          <span class="location-select-label">Field Office</span>
+          <select id="location-select" class="location-select">
+            <option value="redwood-city" selected>Redwood City, CA</option>
+            <option value="stanford">Stanford, CA</option>
+            <option value="palo-alto">Palo Alto, CA</option>
+            <option value="menlo-park">Menlo Park, CA</option>
+            <option value="san-francisco">San Francisco, CA</option>
+          </select>
+        </label>
+        <button id="locate-button" class="primary-button" type="button">Use Browser Location</button>
+        <p id="status-text" class="status-text">Using the fallback location until told otherwise.</p>
+      </div>
+    </section>
+
+    <section class="tool-tabs" aria-label="Useless tools">
+      <button class="tool-tab is-active" data-tool="hardship" type="button">Outdoor Burdens</button>
+      <button class="tool-tab" data-tool="vibes" type="button">Ambient Affairs</button>
+      <button class="tool-tab" data-tool="loitering" type="button">Stationary Legitimacy</button>
+      <button class="tool-tab" data-tool="queue" type="button">Queue Hardship</button>
+      <button class="tool-tab" data-tool="gravitas" type="button">Executive Presence</button>
+      <button class="tool-tab" data-tool="errand" type="button">Domestic Burdens</button>
+    </section>
+
+    <section class="office-banner card" aria-live="polite">
+      <div class="office-badge">
+        <span class="office-badge-label">Current Office</span>
+        <strong id="office-code">SUM-01</strong>
+      </div>
+      <div class="office-copy">
+        <p id="office-name" class="office-name">Office of Optional Outdoor Burdens</p>
+        <p id="office-note" class="office-note">Taskmaster-grade scrutiny for conditions that objectively do not require this level of ceremony.</p>
+      </div>
+    </section>
+
+    <section class="dashboard-grid">
+      <article class="card conditions-card">
+        <div class="card-heading">
+          <p class="eyebrow">Current Conditions</p>
+          <h2>Atmospheric Evidence</h2>
+        </div>
+
+        <dl id="conditions-list" class="conditions-list" aria-live="polite"></dl>
+      </article>
+
+      <article class="card input-card">
+        <div class="card-heading">
+          <p class="eyebrow">Personal Admissions</p>
+          <h2>Subjective Complications</h2>
+        </div>
+
+        <form id="controls-form" class="controls-form">
+          <label>
+            <span id="fragility-label">Emotional fragility</span>
+            <input id="fragility-input" type="range" min="0" max="10" step="1" value="6" />
+            <span id="fragility-caption" class="range-caption">Selected setting: <output id="fragility-output">6</output>/10</span>
+          </label>
+
+          <label>
+            <span id="hydration-label">Hydration confidence</span>
+            <input id="hydration-input" type="range" min="0" max="10" step="1" value="4" />
+            <span id="hydration-caption" class="range-caption">Selected setting: <output id="hydration-output">4</output>/10</span>
+          </label>
+
+          <label>
+            <span id="urgency-label">Administrative urgency</span>
+            <input id="urgency-input" type="range" min="0" max="10" step="1" value="3" />
+            <span id="urgency-caption" class="range-caption">Selected setting: <output id="urgency-output">3</output>/10</span>
+          </label>
+
+          <label>
+            <span id="composure-label">Public composure</span>
+            <input id="composure-input" type="range" min="0" max="10" step="1" value="5" />
+            <span id="composure-caption" class="range-caption">Selected setting: <output id="composure-output">5</output>/10</span>
+          </label>
+
+          <label>
+            <span id="theatrics-label">Narrative theatricality</span>
+            <input id="theatrics-input" type="range" min="0" max="10" step="1" value="5" />
+            <span id="theatrics-caption" class="range-caption">Selected setting: <output id="theatrics-output">5</output>/10</span>
+          </label>
+
+          <label>
+            <span id="character-label">Are you pretending this outing builds character?</span>
+            <select id="character-select">
+              <option value="0">Loading options...</option>
+            </select>
+          </label>
+
+          <p class="form-note">Adjust the factors, then submit your absurd case file for official review.</p>
+
+          <button id="recalculate-button" class="secondary-button" type="submit">Issue Finding</button>
+        </form>
+      </article>
+
+      <article id="results-card" class="card results-card">
+        <div class="card-heading">
+          <p id="result-eyebrow" class="eyebrow">Outdoor Hardship Calculator</p>
+          <h2 id="result-title">Awaiting atmospheric judgment</h2>
+        </div>
+
+        <div class="score-display">
+          <div>
+            <p class="score-label">Official Score</p>
+            <p id="result-score" class="score-value">--</p>
+          </div>
+          <p id="result-rank" class="score-rank">No determination yet</p>
+        </div>
+
+        <div class="seal-row" aria-hidden="true">
+          <div class="seal-mark">
+            <span>1891-ish</span>
+            <strong>SUM</strong>
+            <span>Administrative Confidence</span>
+          </div>
+          <p class="seal-copy">Certified in a spirit of total procedural sincerity.</p>
+        </div>
+
+        <p id="result-summary" class="result-summary">
+          Loading live conditions so your difficulties can be quantified with inappropriate confidence.
+        </p>
+
+        <ul id="result-breakdown" class="result-breakdown"></ul>
+
+        <section class="certificate-panel" aria-labelledby="certificate-title">
+          <div class="certificate-header">
+            <div>
+              <p class="eyebrow">Official Certificate</p>
+              <h3 id="certificate-title">Registrar-Style Findings</h3>
+            </div>
+            <button id="copy-certificate-button" class="secondary-button" type="button">Copy Certificate</button>
+          </div>
+
+          <pre id="certificate-text" class="certificate-text">Awaiting certification.</pre>
+        </section>
+      </article>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
