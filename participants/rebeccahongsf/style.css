@@ -458,6 +458,24 @@ body {
   margin-bottom: 0 !important;
 }
 
+/* ── PRIZE LINK ─────────────────────────────────── */
+
+.prize-link {
+  display: inline-block;
+  margin-top: 1.25rem;
+  color: var(--yellow);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  opacity: 0.85;
+  transition: opacity 0.15s;
+}
+
+.prize-link:hover {
+  opacity: 1;
+}
+
 /* ── CONFETTI ───────────────────────────────────── */
 
 #confetti-container {
