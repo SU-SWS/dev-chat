@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Login</title>
+<title>Create Account</title>
 <style>
   * { box-sizing: border-box; }
   body {
@@ -75,8 +75,8 @@
 </head>
 <body>
   <form class="card" id="form" autocomplete="off">
-    <h1>Sign in</h1>
-    <div class="sub">Welcome back. Please verify you are a real human.</div>
+    <h1>Create account</h1>
+    <div class="sub">Join us. Please prove you are a real human.</div>
 
     <label for="username">Username</label>
     <input id="username" type="text" placeholder="your-handle" required>
@@ -91,7 +91,7 @@
     </ul>
 
     <div class="banner" id="banner"></div>
-    <button id="submit" type="submit" disabled>Sign in</button>
+    <button id="submit" type="submit" disabled>Create account</button>
   </form>
 
 <script>
@@ -138,7 +138,7 @@
     submit.disabled = !allPass;
     if (allPass) {
       banner.className = 'banner ok';
-      banner.textContent = 'Incredible. You may now sign in.';
+      banner.textContent = 'Incredible. You may now create your account.';
     } else {
       banner.className = 'banner';
       banner.textContent = '';
@@ -176,9 +176,10 @@
       submit.style.transform = `translate(${tx}px, ${ty}px)`;
       submit.textContent = TAUNTS[dodges];
       dodges++;
-    } else {
-      submit.style.transform = '';
-      submit.textContent = 'Sign in';
+      if (dodges === 5) {
+        submit.style.transform = '';
+        submit.textContent = 'Create account';
+      }
     }
   });
 
@@ -186,7 +187,7 @@
     e.preventDefault();
     if (dodges < 5) return;
     banner.className = 'banner ok';
-    banner.textContent = '✓ Authenticated. Welcome, Champion of Bureaucracy.';
+    banner.textContent = '✓ Account created.';
   });
 
   update();
