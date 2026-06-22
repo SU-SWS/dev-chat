@@ -1,0 +1,185 @@
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  background: radial-gradient(circle at top, #4d7cfe 0%, #0f172a 70%);
+  color: white;
+}
+
+main {
+  text-align: center;
+  padding: 2rem;
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 24px;
+  background: rgba(15, 23, 42, 0.88);
+  box-shadow: 0 32px 80px rgba(15,23,42,0.25);
+  width: 100%;
+  max-width: none;
+}
+
+button {
+  appearance: none;
+  border: none;
+  border-radius: 9999px;
+  padding: 0.9rem 1.6rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+}
+
+#message {
+  margin-top: 1.25rem;
+  font-size: 1.05rem;
+}
+
+.scene {
+  display: grid;
+  place-items: center;
+  gap: 1.5rem;
+  padding: 3rem 0 2rem;
+  width: 100%;
+  min-height: 360px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 28px;
+  overflow: hidden;
+}
+
+.car {
+  position: relative;
+  width: 360px;
+  height: 180px;
+  transform-origin: calc(100% - 32px) 100%;
+  animation: wheelie 5s ease forwards;
+}
+
+.car-body {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 20px;
+  margin: 0 auto;
+  width: 320px;
+  height: 120px;
+  background: #dc2626;
+  border-radius: 48px 48px 28px 28px;
+  box-shadow: inset -8px 8px 0 rgba(0,0,0,0.1), 0 18px 40px rgba(0,0,0,0.24);
+}
+
+.car-body::before {
+  content: '';
+  position: absolute;
+  left: 50px;
+  top: -24px;
+  width: 160px;
+  height: 80px;
+  background: #dc2626;
+  border-radius: 48px 48px 18px 18px;
+}
+
+.car-window {
+  position: absolute;
+  top: 14px;
+  width: 92px;
+  height: 48px;
+  background: rgba(255,255,255,0.7);
+  border-radius: 18px;
+  border: 2px solid rgba(255,255,255,0.8);
+}
+
+.window-front {
+  left: 40px;
+}
+
+.window-back {
+  right: 40px;
+}
+
+.headlight {
+  position: absolute;
+  right: -10px;
+  top: 60px;
+  width: 24px;
+  height: 24px;
+  background: #fde68a;
+  border-radius: 50%;
+  box-shadow: 0 0 20px rgba(253, 230, 138, 0.6);
+}
+
+.wheel {
+  position: absolute;
+  bottom: -18px;
+  width: 76px;
+  height: 76px;
+  background: #22c55e;
+  border: 8px solid #166534;
+  border-radius: 50%;
+  box-shadow: inset 0 0 12px rgba(0,0,0,0.2);
+  animation: wheel-spin 0.9s linear infinite;
+}
+
+.wheel-front {
+  left: 32px;
+}
+
+.wheel-back {
+  right: 32px;
+}
+
+.road {
+  width: 100%;
+  height: 10px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.12) 20%, rgba(255,255,255,0.35) 40%, rgba(255,255,255,0.12) 60%);
+  border-radius: 8px;
+}
+
+@keyframes wheelie {
+  0% {
+    transform: translateX(0) rotate(0deg);
+  }
+  10% {
+    transform: translateX(-8vw) rotate(6deg);
+  }
+  18% {
+    transform: translateX(-2vw) rotate(2deg);
+  }
+  24% {
+    transform: translateX(8vw) rotate(-10deg);
+  }
+  36% {
+    transform: translateX(20vw) rotate(-12deg);
+  }
+  62% {
+    transform: translateX(44vw) rotate(-8deg);
+  }
+  100% {
+    transform: translateX(80vw) rotate(0deg);
+  }
+}
+
+@keyframes wheel-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+.caption {
+  margin: 0;
+  color: #f8fafc;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
